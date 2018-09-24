@@ -2,5 +2,5 @@
 
 <@c.page>
 <h2>Hi, user</h2>
-<a href="/main">Main page</a>
+<a href="/main" class="badge badge-success">Main page</a>
 </@c.page>

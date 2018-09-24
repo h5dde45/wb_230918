@@ -4,6 +4,7 @@
 <@c.page>
 <div>
     <@l.logout/>
+    <a class="badge badge-success" href="/user">User list</a>
 </div>
 <div>
     <form action="/main" method="post">
