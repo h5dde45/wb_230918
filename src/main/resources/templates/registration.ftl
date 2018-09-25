@@ -2,7 +2,9 @@
 <#import "parts/registration.ftl" as r>
 
 <@c.page>
-Add new user
+<div class="mb-3">
+    Add new user
+</div>
 <div>${message!}</div>
     <@r.registration />
 </@c.page>

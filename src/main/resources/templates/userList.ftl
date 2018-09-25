@@ -2,11 +2,11 @@
 
 <@c.page>
 
-<div class="col-sm-6 mt-3 ml-5">
+<div class="col-sm-6 mt-3 ">
     <a class="badge badge-success" href="/main">Main page</a>
 </div>
 <div class="col-sm-6">
-    <table class="table mt-3 ml-5">
+    <table class="table mt-3">
         <thead class="thead-dark">
         <tr>
             <th scope="col">Username</th>
