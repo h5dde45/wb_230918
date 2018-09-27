@@ -13,16 +13,24 @@
             <li class="nav-item">
                 <a class="nav-link" href="/">Home</a>
             </li>
+        <#if user??>
             <li class="nav-item">
                 <a class="nav-link" href="/main">Messages</a>
             </li>
+        </#if>
+
         <#if isAdmin>
             <li class="nav-item">
                 <a class="nav-link" href="/user">User list</a>
             </li>
         </#if>
         </ul>
+    <#if user??>
         <div class="navbar-text">${name}</div>
-    <@l.logout/>
+        <@l.logout/>
+    <#else >
+        <div class="navbar-text">The user is not defined..</div>
+        <a class="btn btn-success ml-3" href="/login">Sign In</a>
+    </#if>
     </div>
 </nav>
