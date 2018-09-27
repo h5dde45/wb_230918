@@ -18,10 +18,14 @@
                 <a class="nav-link" href="/main">Messages</a>
             </li>
         </#if>
-
         <#if isAdmin>
             <li class="nav-item">
                 <a class="nav-link" href="/user">User list</a>
+            </li>
+        </#if>
+        <#if user??>
+            <li class="nav-item">
+                <a class="nav-link" href="/user/profile">Profile</a>
             </li>
         </#if>
         </ul>
@@ -30,7 +34,7 @@
         <@l.logout/>
     <#else >
         <div class="navbar-text">The user is not defined..</div>
-        <a class="btn btn-success ml-3" href="/login">Sign In</a>
+        <a class="btn btn-warning ml-3" href="/login">Sign In</a>
     </#if>
     </div>
 </nav>
