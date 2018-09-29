@@ -1,6 +1,9 @@
 package com.example.demo.domain;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class Message {
@@ -8,7 +11,12 @@ public class Message {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "This field should not be empty")
+    @Length(max = 2048, message = "Text too long (no more than two kilobytes)")
     private String text;
+
+    @NotBlank(message = "This field should not be empty")
+    @Length(max = 255, message = "Text too long ")
     private String tag;
 
     private byte[] image;

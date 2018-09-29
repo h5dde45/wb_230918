@@ -4,6 +4,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.Set;
 
@@ -14,9 +16,17 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @NotBlank(message = "This field should not be empty")
     private String username;
+
+    @NotBlank(message = "This field should not be empty")
     private String password;
+
     private boolean active;
+
+    @NotBlank(message = "This field should not be empty")
+    @Email(message = "Email recording is not correct")
     private String email;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
@@ -100,4 +110,5 @@ public class User implements UserDetails {
     public void setEmail(String email) {
         this.email = email;
     }
+
 }

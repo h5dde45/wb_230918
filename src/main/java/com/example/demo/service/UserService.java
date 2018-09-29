@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -18,25 +19,31 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService implements UserDetailsService {
-    private final UserRepo userRepo;
-
-    private final UserTempRepo userTempRepo;
-
-    private final MailSender mailSender;
-
-    @Value("${address.custom.domain}")
-    private String addressCustomDomain;
+    @Autowired
+    private  UserRepo userRepo;
 
     @Autowired
-    public UserService(UserRepo userRepo, UserTempRepo userTempRepo, MailSender mailSender) {
-        this.userRepo = userRepo;
-        this.userTempRepo = userTempRepo;
-        this.mailSender = mailSender;
-    }
+    private  UserTempRepo userTempRepo;
+
+    @Autowired
+    private  MailSender mailSender;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Value("${hostname}")
+    private String hostname;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepo.findByUsername(username);
+        User user = userRepo.findByUsername(username);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        return user;
     }
 
     public boolean addUser(User user) {
@@ -47,7 +54,7 @@ public class UserService implements UserDetailsService {
 
         UserTemp userTemp = new UserTemp();
         userTemp.setUsername(user.getUsername());
-        userTemp.setPassword(user.getPassword());
+        userTemp.setPassword(passwordEncoder.encode(user.getPassword()));
         userTemp.setEmail(user.getEmail());
         userTemp.setActivationCode(UUID.randomUUID().toString());
         userTempRepo.save(userTemp);
@@ -61,8 +68,9 @@ public class UserService implements UserDetailsService {
         if (!StringUtils.isEmpty(userTemp.getEmail())) {
             String message = String.format(
                     "Hello, %s! \n" +
-                            "To activate, click on this link: http://" + addressCustomDomain + "/activate/%s",
+                            "To activate, click on this link: http://%s/activate/%s",
                     userTemp.getUsername(),
+                    hostname,
                     userTemp.getActivationCode()
             );
 
@@ -123,9 +131,11 @@ public class UserService implements UserDetailsService {
         }
 
         if (!StringUtils.isEmpty(password)) {
-            user.setPassword(password);
+            user.setPassword(passwordEncoder.encode(password));
         }
 
-        userRepo.save(user);
+        if (isEmailChanged || !StringUtils.isEmpty(password)) {
+            userRepo.save(user);
+        }
     }
 }
