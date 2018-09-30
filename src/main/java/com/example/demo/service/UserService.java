@@ -1,12 +1,15 @@
 package com.example.demo.service;
 
+import com.example.demo.domain.Email;
 import com.example.demo.domain.Role;
 import com.example.demo.domain.User;
 import com.example.demo.domain.UserTemp;
+import com.example.demo.repos.MailRepo;
 import com.example.demo.repos.UserRepo;
 import com.example.demo.repos.UserTempRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,7 +32,13 @@ public class UserService implements UserDetailsService {
     private  MailSender mailSender;
 
     @Autowired
+    private JavaMailSenderImpl javaMailSender;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private MailRepo mailRepo;
 
     @Value("${hostname}")
     private String hostname;
@@ -73,6 +82,10 @@ public class UserService implements UserDetailsService {
                     hostname,
                     userTemp.getActivationCode()
             );
+
+        Email emailById = mailRepo.getOne(1L);
+        javaMailSender.setUsername(emailById.getLogin());
+        javaMailSender.setPassword(emailById.getPassword());
 
             mailSender.send(userTemp.getEmail(), "Activation code", message);
         }
@@ -138,7 +151,6 @@ public class UserService implements UserDetailsService {
             userRepo.save(user);
         }
     }
-
     public void subscribe(User currentUser, User user) {
         user.getSubscribers().add(currentUser);
 
