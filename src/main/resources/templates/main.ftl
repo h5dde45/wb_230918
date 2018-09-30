@@ -1,4 +1,5 @@
 <#import "parts/common.ftl" as c>
+<#include "parts/security.ftl">
 
 <@c.page>
 <div class="form-row">
@@ -58,17 +59,24 @@
     <#list messages as message>
         <div class="card my-3">
             <#if message.image??>
-                <img src="/img/${message.id}"  class="card-img-top">
+                <img src="/img/${message.id}" class="card-img-top">
             </#if>
             <div class="m-2">
                 <span>${message.text}</span>
                 <i>${message.tag}</i>
             </div>
             <div class="card-footer text-muted">
-            ${message.authorName}
+                <a href="/user-messages/${message.author.id}">${message.authorName}</a>
+                <#if message.author.id == currentUserId>
+                    <a class="btn btn-primary" href="/user-messages/${message.author.id}?message=${message.id}">
+                        Edit
+                    </a>
+                </#if>
             </div>
         </div>
     <#else>
         No message
     </#list>
+</div>
+
 </@c.page>
