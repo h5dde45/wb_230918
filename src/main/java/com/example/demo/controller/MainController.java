@@ -4,6 +4,9 @@ import com.example.demo.domain.Message;
 import com.example.demo.domain.User;
 import com.example.demo.repos.MessageRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,14 +33,15 @@ public class MainController {
     private MessageRepo messageRepo;
 
     @GetMapping("/")
-    public String greeting(@RequestParam(name = "name", required = false,
-            defaultValue = "asd") String name, Model model) {
+    public String greeting() {
         return "greeting";
     }
 
     @GetMapping("/main")
-    public String main(Model model) {
-        model.addAttribute("messages", messageRepo.findAll());
+    public String main(Model model,
+                       @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) {
+        model.addAttribute("page", messageRepo.findAll(pageable));
+        model.addAttribute("url", "/main");
         return "main";
     }
 
@@ -55,15 +59,17 @@ public class MainController {
             @Valid Message message,
             BindingResult bindingResult,
             @RequestParam MultipartFile file,
-            Model model) throws IOException {
+            Model model,
+            @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
+    ) throws IOException {
         message.setAuthor(user);
 
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
 
             model.mergeAttributes(errorsMap);
             model.addAttribute("message", message);
-        }else {
+        } else {
             if (file != null && !file.getOriginalFilename().isEmpty()) {
                 message.setImage(file.getBytes());
             }
@@ -71,19 +77,22 @@ public class MainController {
 
             messageRepo.save(message);
         }
-
-        model.addAttribute("messages", this.messageRepo.findAll());
+        model.addAttribute("url", "/main");
+        model.addAttribute("page", this.messageRepo.findAll(pageable));
         return "main";
     }
 
     @PostMapping("/filter")
     public String filter(@RequestParam String filter,
-                         Model model) {
+                         Model model,
+                         @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable
+    ) {
         if (filter != null && !filter.isEmpty()) {
-            model.addAttribute("messages", this.messageRepo.findByTag(filter));
+            model.addAttribute("page", this.messageRepo.findByTag(filter, pageable));
         } else {
-            model.addAttribute("messages", this.messageRepo.findAll());
+            model.addAttribute("page", this.messageRepo.findAll(pageable));
         }
+        model.addAttribute("url", "/filter");
         model.addAttribute("filter", filter);
         return "main";
     }
